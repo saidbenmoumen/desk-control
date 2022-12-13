@@ -14,6 +14,8 @@ const positionCharID = '99fa0021-338a-1024-8a49-009c0215f78a';
 
 export const DeskProvider: React.FC<any> = ({ children }) => {
   const namePrefix = 'Desk';
+  const max = 6500
+  const min = 0
 
   const [state, dispatch] = React.useReducer<
     React.Reducer<State, { type: string; payload: any }>
@@ -52,18 +54,6 @@ export const DeskProvider: React.FC<any> = ({ children }) => {
         4: Number(localStorage.getItem('memo-4')),
       },
     }
-  );
-
-  const shouldStop: boolean | null = React.useMemo(
-    () =>
-      state.move !== null && state.currentPosition !== null
-        ? (state.move.direction === 'down'
-            ? state.currentPosition - state.move.to
-            : state.move.direction === 'up'
-            ? state.move.to - state.currentPosition
-            : -1) < 0
-        : null,
-    [state.move, state.currentPosition]
   );
 
   const callbacks = React.useMemo(
@@ -154,27 +144,19 @@ export const DeskProvider: React.FC<any> = ({ children }) => {
             type: 'SET_MOVE',
             payload: {
               direction: action,
-              to: (state.currentPosition ?? 0) + (action === 'up' ? 1 : -1),
+              to: (state.currentPosition ?? 0) + (action === 'up' ? max : min),
               isDoing: false,
             },
           });
         }
       },
+      _stop: async () => {
+        console.warn("STOP!")
+        await sendCmd('FF00');
+      }
     }),
     [state]
   );
-
-  const moveUp = async () => {
-    await sendCmd('4700');
-  };
-
-  const moveDown = async () => {
-    await sendCmd('4600');
-  };
-
-  const _stop = async () => {
-    await sendCmd('FF00');
-  };
 
   const sendCmd = async (cmd: string) => {
     if (state.service === null) throw 'Service is not connected.';
@@ -189,15 +171,15 @@ export const DeskProvider: React.FC<any> = ({ children }) => {
     // SEND COMMAND -> once ended set is Not Doing
     const char = await state.service.getCharacteristic(charID);
     await char.writeValue(hexStrToArray(cmd)).then((v) => {
-      if (!shouldStop) {
-        dispatch({
-          type: 'SET_MOVE',
-          payload: {
-            ...state.move,
-            isDoing: false,
-          },
-        });
-      }
+      // if (!shouldStop) {
+      //   dispatch({
+      //     type: 'SET_MOVE',
+      //     payload: {
+      //       ...state.move,
+      //       isDoing: false,
+      //     },
+      //   });
+      // }
     });
   };
 
@@ -248,25 +230,6 @@ export const DeskProvider: React.FC<any> = ({ children }) => {
       onPositionChange();
     }
   }, [state.service]);
-
-  /**
-   *
-   */
-  React.useEffect(() => {
-    if (state.move === null) return;
-    if (state.currentPosition === null) return;
-    if (state.move.isDoing) return;
-    if (shouldStop) {
-      _stop();
-      dispatch({ type: 'SET_MOVE', payload: null });
-      return;
-    }
-    state.move.direction === 'up'
-      ? moveUp()
-      : state.move.direction === 'down'
-      ? moveDown()
-      : _stop();
-  }, [state.currentPosition, state.move]);
 
   return (
     <DeskContext.Provider

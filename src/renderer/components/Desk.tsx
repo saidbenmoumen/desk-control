@@ -24,11 +24,10 @@ import { Button, ButtonGroup } from './ButtonGroup/ButtonGroup';
 export const Desk = () => {
   const slots: [1, 2, 3, 4] = [1, 2, 3, 4];
   const [min, setMin] = React.useState<number>(30);
-  const [isEditing, setEditing] = React.useState<boolean>(false);
 
   const {
     state: { device, memos, currentPosition, isSaving, move },
-    callbacks: { onPair, saveMemo, setIsSaving, moveTo },
+    callbacks: { onPair, saveMemo, setIsSaving, moveTo, _stop },
   } = useDesk();
 
   const [lastMove, setLastMove] = React.useState<1 | 4>(4);
@@ -86,7 +85,7 @@ export const Desk = () => {
                   id="up"
                   disabled={!device || isSaving || move?.isDoing}
                   onMouseDown={() => moveTo('up')}
-                  onMouseUp={() => moveTo(null)}
+                  onMouseUp={() => _stop(null)}
                 >
                   <FontAwesomeIcon icon={faChevronUp} size={'xl'} />
                 </Button>
@@ -95,7 +94,7 @@ export const Desk = () => {
                   id="down"
                   disabled={!device || isSaving || move?.isDoing}
                   onMouseDown={() => moveTo('down')}
-                  onMouseUp={() => moveTo(null)}
+                  onMouseUp={() => _stop(null)}
                 >
                   <FontAwesomeIcon icon={faChevronDown} size={'xl'} />
                 </Button>
