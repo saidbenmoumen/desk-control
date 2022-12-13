@@ -1,11 +1,8 @@
-### TODOS
-
-##### v0.0.1-alpha
-[ ] - close/minimize/drag events not working
-[ ] - add reload button beside - | x
-[ ] - auto-move not working 
-[ ] - better responsive
-[ ] - implement Tray STAND/SIT checkboxes
-[ ] - implement Tray Memos positions
-[ ] - fix UP\DOWN on MouseDown keeps going up until onMouseUp
-[ ] - design app icon 
+## TODO
+v0.0.1-beta
+- [ ] holding up\down to keep moving until stop holding
+- [ ] implement auto-move functions
+- [ ] minimize/close buttons window
+- [ ] handle auto move desk / fallbacks to re-enable buttons instead of keeps disabled
+- [ ] some lots of re-factoring
+- [ ] responsive updates
